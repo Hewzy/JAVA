@@ -1,0 +1,562 @@
+JAVA 中的几种基本数据类型是什么，各自占用多少字节。
+8种;short(2),char(2),int(4),boolean(T|F),double(8),float(4),long(8),byte(1)
+1.5、集合框图： Map 集合
+
+String 类能被继承吗，为什么。
+不能被继承，String类是final类 2.5.Throws和Throw的区别
+
+1、throws出现在方法函数头；而throw出现在函数体。
+2、throws表示出现异常的一种可能性，并不一定会发生这些异常；throw则是抛出了异常，执行throw则一定抛出了某种异常。
+String，Stringbuffer，StringBuilder 的区别。
+String是不可变的字符序列，
+StringBuffer是可变字符序列，带有缓冲区，初始容量16，本质是通过char[] value存储字符；线程安全 他的方法设计安全都用synchronized修饰；
+StringBuilder非线程安全；
+
+ArrayList 和 LinkedList 有什么区别。
+ArrayList底层是数组，Object[] ;按顺序存储，非线程安全，特点是：访问快O(n);
+LinkedList implements List, Deque；List做顺序的列表，Deque做双端队列；非线程安全
+
+讲讲类的实例化顺序，比如父类静态数据，构造函数，字段，子类静态数据，构造函数， 字段，当 new 的时候，他们的执行顺序。
+父类静态代码块--子类静态代码块--父类代码块--父类构造器--子类代码块--子类构造器
+类加载的过程：
+1. 加载：通过累的全限定名获取二进制字节流，将二进制字节流转换成方法区中的运行时数据结构，在内存中生成Java.lang.class对象；
+2. 链接： 2.1. 校验--（省略）
+2.2. 准备：给静态数据（类变量）分配内存空间，并赋予默认值；给final常量分配空间并赋予初始值
+2.3. 解析：符号引用--->直接引用
+3. 初始化：类构造器；给类变量赋初始值
+4. 使用：实例构造器；new 
+5. 销毁
+
+用过哪些 Map 类，都有什么区别，HashMap 是线程安全的吗,并发下使用的 Map 是什么，
+他们内部原理分别是什么，比如存储方式，hashcode，扩容，默认容量等。
+	1、HashMap、LinkedHashMap、TreeMap;<br> 
+  HashMap是非线程安全的Map，存储Key-Value；允许key=null（key为null的元素始终放在HashMap的第一个位置）；存取没有顺序；<br>
+  TreeMap是A Red-Black tree；Comparable，Comparator实现存储顺序；非线程安全<br>
+  LinkedHashMap是一个有序的map，with predictable iteration order（有顺序）；也是一个doubly-linked list；<br>
+  transient LinkedHashMap.Entry<K,V> head;-->The head (eldest) of the doubly linked list.<br>
+  transient LinkedHashMap.Entry<K,V> tail;-->The tail (youngest) of the doubly linked list.维护的元素是entry，<br>
+  并发下使用的是ConcurrentHashMap;<br>
+  	2、 HashMap:初始容量16；加载因子0.75；threshold=16*0.75就扩容；<br>
+  1、JDK1.8之后--->底层数据结构是：数组+链表+红黑树；<br>
+  2、存放数据时候，<br>
+	2.1计算key的hash值；<br>
+	2.2通过hash(key)和table.length求出元素存放的数组下标；<br>
+	2.3与该Bucket处存放的链表集合进行迭代比较；若key相同，则替换成新的value，否则将新的entry放在链表头。<br>
+  3、当链表中元素个数超过8；转为红黑树结构，或者数组的length大于64；
+![HashMap structure](https://github.com/nextyearmuscleman/studyJava/raw/master/picture/HashMap%E7%BB%93%E6%9E%84.PNG)
+JAVA8 的 ConcurrentHashMap 为什么放弃了分段锁，有什么问题吗，如果你来设计，你如何设计。
+JDK1.7中ConcurrentHashMap使用Segment implements ReentrantLock锁，数据结构和JDK1.7中的HashMap类似。
+其中不允许NUll值|null键 ConcurrentHashMap JDK1.8中存储数据和HashMap类似，数组+链表+红黑树；特点是可以并发读，写加锁--> CAS+Synchronized
+DEFAULT_CAPACITY = 16;
+.put()的时候加锁， synchronized (f) -->给桶加锁，锁粒度变细了，同时不允许key=null&&value=null；
+
+有没有有顺序的 Map 实现类，如果有，他们是怎么保证有序的。
+有，LinkedHashMap是有序的map，允许key=null&&value=null；
+
+抽象类和接口的区别，类可以继承多个类么，接口可以继承多个接口么,类可以实现多个接口么。
+类不可以继承多个类；接口可以继承多个接口-->interface c extends a,b{;类可以实现多个接口;
+接口中的方法默认是private，且没有实现；变量是public static final;
+抽象类中可以有具体的实现方法，也可以有抽象方法。
+
+继承和聚合的区别在哪。
+继承是编译时多态，耦合性较高
+组合是运行时多态，少了耦合，
+
+IO 模型有哪些，讲讲你理解的 nio，他和 bio，aio 的区别是啥，谈谈 reactor 模型。
+同步阻塞IO、同步非阻塞IO（长轮询）、IO复用、信号驱动IO---->是同步IO 同步、异步、阻塞、非阻塞
+NIO:面向缓存的非阻塞IO，工作机制是：Channel、Buffer、Selector；
+NIO模型 IO：面向流的阻塞IO；
+reactor 模型reactor
+
+反射的原理，反射创建类实例的三种方式是什么。
+Class.forName("全限定类名")、对象.getClass()、类.class;
+能够在运行的时候通过Class对象知道类的相关信息，或者通过无参的构造器去实例化对象；类型信息存储在方法区中。
+
+        1、数组这种类型并不是由常规的编译器编译生成，而是由虚拟机动态创建的，
+        所以想要通过反射的方式实例化一个数组类型是得依赖 Array 这个类型的相关 newInstance 方法的。
+        2、Class里的 getComponentType()方法--如果似乎一个Array类型则返回元素的类型，否则都是返回null；
+        3、Array提供了newInstance(Class<?> componentType, int length);
+        Creates a new array with the specified component type and length.
+        4、Array类位于java.lang.reflect.Array;包下，在于数组是一个特殊的对象，Array类提供了利用反射实例化数组的方法；
+        5、 [I --->I代表int类型，[代表是一个int型的数组
+         */
+        String b = "abd";
+        System.out.println(b.getClass().getComponentType());//null
+
+        //使用Array实例化一个特定type和length的数组
+        int[] intArray = (int[]) Array.newInstance(int.class, 3);
+        System.out.println(intArray.getClass().getComponentType());//int
+        System.out.println(intArray.length);//3
+       /*
+       使用Array给数组设置值
+       void set(Object array, int index, Object value)
+        */
+        Array.set(intArray,0,1);
+        Array.set(intArray,1,2);
+        System.out.println(intArray[0]);//1
+       /*
+       使用Array获取指定索引的值
+        Object get(Object array, int index)
+        */
+        System.out.println(Array.get(intArray,1));//2
+        Class stringArrayClass = String[].class;
+        System.out.println(stringArrayClass);//class [Ljava.lang.String;
+
+        Class clazz = Class.forName("[I");
+        //System.out.println(clazz.newInstance());
+        //Caused by: java.lang.NoSuchMethodException: [I.<init>()
+
+        Class clazz2 = Class.forName("[Ljava.lang.String;");
+        System.out.println(clazz2);//class [Ljava.lang.String;
+
+        /*
+        不能通过Class.forName()方法获取一个原生数据类型的Class对象
+         */
+        //Class intClass1 = Class.forName("I");
+       // Class intClass2 = Class.forName("int");
+        //System.out.println(intClass1);
+        //Exception in thread "main" java.lang.ClassNotFoundException: I
+
+        Class clazz3 = Array.newInstance(String.class, 0).getClass();
+        System.out.println("is array: " + clazz3.isArray());
+        
+        /*
+        反射和泛型：
+        1、利用反射跳过泛型检查：
+         */
+        ArrayList<Integer> list = new ArrayList<>();
+        list.add(21);
+        //list.add("hello");
+        Class c = list.getClass();
+        Method m = c.getMethod("add",Object.class);
+        m.invoke(list,"hello");
+        System.out.println(list);
+        //[21, hello]
+    }
+反射中，Class.forName 和 ClassLoader 区别。
+Class.forName(className)实际调用的是--->native Class forName0(String name, boolean initialize,ClassLoader loader,Class caller)
+initialize-->是否要初始化，默认是true，触发目标对象的 static代码块执行，static参数也也会被再次初始化。
+ClassLoader.loadClass(className)方法，内部实际调用的方法是 ClassLoader.loadClass(String name, boolean resolve)
+resolve-->是否链接，默认是false；不对。.class文件进行链接，那么static代码块就不会执行
+JDBC中使用的是Class.forName(className)加载的原因，DriverManager是放在static代码块中的，执行反射之后回来执行static代码块，而ClassLoader.loaderclass不会执行链接步骤。
+
+描述动态代理的几种实现方式，分别说出相应的优缺点。
+jdk动态代理和cglib动态代理
+jdk动态代理：jdk动态代理是由java内部的反射机制来实现的;前提:必须是目标类基于统一的接口
+cglib动态代理底层则是借助asm来实现的
+
+动态代理与 cglib 实现的区别。
+为什么 CGlib 方式可以对接口实现代理。
+final 的用途。
+final修饰类---该类不可被继承
+final修饰变量---常量，仅可被赋值一次
+final修饰方法---final方法不可以被重写
+
+写出三种单例模式实现。
+如何在父类中为子类自动完成所有的 hashcode 和 equals 实现？这么做有何优劣。 在父类中直接实现 hashcode 和 equals ；
+public static void main(String[] args) {
+        Son s = new Son("cy",21);
+        Son s1 = new Son("cy", 21);
+        HashSet h = new HashSet();
+        h.add(s);
+        h.add(s1);
+        System.out.println(h.toString());
+        /*
+        1、Father类中没有@Override--hashcode()和equals()
+        [Son{name='cy', age=21}, Son{name='cy', age=21}]
+        
+        2、Father类中@Override--hashcode()和equals()
+        [Son{name='cy', age=21}]
+         */
+
+    }
+}
+class Father {
+    private String name;
+    private int age;
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Father father = (Father) o;
+        return age == father.age &&
+                Objects.equals(name, father.name);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(name, age);
+    }
+}
+class Son extends Father{
+    private String name;
+    private int age;
+
+    @Override
+    public String toString() {
+        return "Son{" +
+                "name='" + name + '\'' +
+                ", age=" + age +
+                '}';
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public int getAge() {
+        return age;
+    }
+
+    public Son(String name, int age) {
+        this.name = name;
+        this.age = age;
+    }
+请结合 OO 设计理念，谈谈访问修饰符 public、private、protected、default 在应用设计中的作用。 safe????
+深拷贝和浅拷贝区别。
+.clone()方法，
+浅拷贝：仅拷贝对象以及对象里面的成员
+深拷贝：将引用所指向的对象也拷贝过来
+
+数组和链表数据结构描述，各自的时间复杂度。
+数组：存储数据在内存上连续，访问块；数组由JVM创建，根据ComponentType和Length
+链表：由指针进行数据之间的连接，存储地址不连续
+
+error 和 exception 的区别，CheckedException，RuntimeException 的区别。
+error程序错误，导致崩溃；exception是异常，可以捕捉<br。 CheckedException：受检查的异常，需要在编译时捕获的异常，比如:IO\SQL....
+RuntimeException:也是UncheckedException，是运行时异常，无法捕获，会导致程序发生错误，可能停止执行。比如：ClassNotFound\ClassCast\OOM\StackOverFlow\NullPointer
+
+请列出 5 个运行时异常。 RUntimeException:ClassNotFound\ClassCast\OOM\StackOverFlow\NullPointer\IndexOutOfBoundsException
+在自己的代码中，如果创建一个 java.lang.String 类，这个类是否可以被类加载器加载，为什么 不会，类加载机制是双亲委派加载，从下到上开始搜索需要加载的类是否存在，再一次从上向下加载，确保类只被加载一次。
+说一说你对 java.lang.Object 对象中 hashCode 和 equals 方法的理解。在什么场景下需要重新实现这两个方法。
+这两个方法如果没有重写(override)，那么比较的是两个对象的存储地址是否一致；hashcode()求出的值不同代表两个对象一定不相等；但是hashcode值相同的话不一定两个对象相同；此时通过equals()判断，如果相同则肯定相同；
+在使用集合添加自定义的对象的时候，需要重新写hashcode()和equals()方法。
+
+在 jdk1.5 中，引入了泛型，泛型的存在是用来解决什么问题。 泛型的主要目的时"使类型参数化"；运行在编译期间。运行期间擦除泛型，避免了在运行时出现ClassCastException。
+List<?> list = new ArrayList<>();可以存放不确定的类型
+public class Demo {
+    public static void main(String[] args) {
+        son<String> s = new son<>("hello");
+        System.out.println(s.getData());//hello
+        son<Integer> s1 = new son<>(21);
+        System.out.println(s1.getData());//21
+    }
+}
+class son<T>{
+    private T data;
+    public son(T data){
+        this.data = data;
+    }
+    public T getData(){
+        return data;
+    }
+这样的 a.hashcode() 有什么用，与 a.equals(b)有什么关系。 a.hashcode()-->返回a的hash值。
+a.equals(b)--->判断a和b的两个对象的字面量是否一致。
+有没有可能 2 个不相等的对象有相同的 hashcode。 可能；hash的算法会导致出现hash冲突。
+Java 中的 HashSet 内部是如何工作的。 允许null值；不允许重复的元素；不保证与插入的顺序保持一致；
+用HashMap对它的内部对象进行排序
+  Dummy value to associate with an Object in the backing Map
+    private static final Object PRESENT = new Object();
+  使用常量PRESENT作为map中的value，HashSet中的值都有一个相同的value。依赖HashMap。
+什么是序列化，怎么序列化，为什么序列化，反序列化会遇到什么问题，如何解决。 1、将对象持久化到硬盘中；
+2、实现Serializable接口(该接口是标识接口，如果不主动写SerialVersionUID的话，会根据对象的特征计算)、Externalizable接口；
+3、跨进程传递格式化数据,序列化之后可以在两个程序之间传递数据。可以使用trasient关键字修饰成员，该成员就不会被序列化。
+4、进行反序列化时，JVM会把传来的字节流中的serialVersionUID与本地相应实体（类）的serialVersionUID进行比较，如果相同就认为是一致的，可以进行反序列化，否则就会出现序列化版本不一致的异常
+当一个父类实现序列化，子类自动实现序列化，不需要显式实现Serializable接口；
+当一个对象的实例变量引用其他对象，序列化该对象时也把引用对象进行序列化；
+java8 的新特性。
+lamda表达式(重磅)
+集合的stream操作
+Date-Time Package
+
+JVM 知识
+什么情况下会发生栈内存溢出。
+1、方法使用了递归次数过多，导致StackOverflow；
+2、程序中含有过多的线程，导致所占用的内存没有及时地释放，导致OutOfMemory
+
+JVM 的内存结构，Eden 和 Survivor 比例。
+方法区：类的信息、
+栈：引用、基本类型、局部变量
+堆：对象;而堆内存分为Young、Old；其中Young分为Eden、From Survivor、To Survivor；默认按8：1：1比例 Java内存结构
+
+JVM 内存为什么要分成新生代，老年代，持久代。新生代中为什么要分为 Eden 和 Survivor。
+因为Java的垃圾回收机制针对年轻代和老年代执行不同的垃圾回收机制：
+新生代通常存活时间较短，因此基于复制算法来进行回收--Minor GC
+复制算法：当对象在 Eden ( 包括一个 Survivor 区域，这里假设是 from 区域 ) 出生后，在经过一次 Minor GC 后，如果对象还存活，并且能够被另外一块 Survivor 区域所容纳( 上面已经假设为 from 区域，这里应为 to 区域，即 to 区域有足够的内存空间来存储 Eden 和 from 区域中存活的对象 )，则使用复制算法将这些仍然还存活的对象复制到另外一块 Survivor 区域 ( 即 to 区域 ) 中，然后清理所使用过的 Eden 以及 Survivor 区域 ( 即 from 区域 )，并且将这些对象的年龄设置为1，以后对象在 Survivor 区每熬过一次 Minor GC，就将对象的年龄 + 1，当对象的年龄达到某个值时 ( 默认是 15 岁，可以通过参数 -XX:MaxTenuringThreshold 来设定 )，这些对象就会成为老年代。
+老年代对象存活的时间比较长，比较稳定，因此采用标记（Mark）算法来进行回收---Full GC
+
+JVM 中一次完整的 GC 流程是怎样的，对象如何晋升到老年代，说说你知道的几种主要的JVM 参数。
+新生代中内存不够的时候执行Minor GC，然后老年代中不够存放对象的时候执行Full GC；
+在新生代中的对象如果经过默认的次数（15？？）还没有被Minor GC回收的话，将其放入老年代。
+-Xms、-XmX、-Xmn：新生代的大小。
+
+你知道哪几种垃圾收集器，各自的优缺点，重点讲下 cms 和 G1，包括原理，流程，优缺点。
+引用计数：无法解决两个无效对象的互相引用
+Root引用：从Root开始向下找，看是否可达对象
+
+垃圾回收算法的实现原理。
+当出现了内存溢出，你怎么排错。
+JVM 内存模型的相关知识了解多少，比如重排序，内存屏障，happen-before，主内存，工作内存等。
+一个主内存，每个线程拥有自己的工作内存。
+
+简单说说你了解的类加载器，可以打破双亲委派么，怎么打破。
+继承ClassLoader并且重写loadClass()
+
+讲讲 JAVA 的反射机制。
+你们线上应用的 JVM 参数有哪些。
+g1 和 cms 区别,吞吐量优先和响应优先的垃圾收集器选择。
+怎么打出线程栈信息。
+请解释如下 jvm 参数的含义： -server -Xms512m -Xmx512m -Xss1024K -XX:PermSize=256m -XX:MaxPermSize=512m -XX:MaxTenuringThreshold=20 XX:CMSInitiatingOccupancyFraction=80 -XX:+UseCMSInitiatingOccupancyOnly。
+开源框架知识
+简单讲讲 tomcat 结构，以及其类加载器流程，线程模型等。
+tomcat 如何调优，涉及哪些参数。
+讲讲 Spring 加载流程。
+监听器加载Spring配置文件-->Spring容器实例化对象-->存入ServletContext--执行Springmvc的加载-->加载Servlet的init()方法-->加载配置文件
+
+Spring AOP 的实现原理。
+反射：
+
+讲讲 Spring 事务的传播属性
+Spring 如何管理事务的。
+Spring 怎么配置事务（具体说出一些关键的 xml 元素）。
+说说你对 Spring 的理解，非单例注入的原理？它的生命周期？循环注入的原理，aop 的实现原理，说说 aop 中的几个术语，它们是怎么相互工作的。
+Springmvc 中 DispatcherServlet 初始化过程。
+netty 的线程模型，netty 如何基于 reactor 模型上实现的。
+为什么选择 netty。
+什么是 TCP 粘包，拆包。解决方式是什么。
+TCP基于数据流的，没有明显的数据长度的标识，所以在传输的过程中，可能会出现粘包和拆包的问题，数据多了|数据少了。
+
+netty 的 fashwheeltimer 的用法，实现原理，是否出现过调用不够准时，怎么解决。
+netty 的心跳处理在弱网下怎么办。
+netty 的通讯协议是什么样的。
+springmvc 用到的注解，作用是什么，原理。
+springboot 启动机制。
+操作系统
+Linux 系统下你关注过哪些内核参数，说说你知道的。
+Linux 下 IO 模型有几种，各自的含义是什么。
+epoll 和 poll 有什么区别。
+平时用到哪些 Linux 命令。
+用一行命令查看文件的最后五行。
+用一行命令输出正在运行的 java 进程。
+介绍下你理解的操作系统中线程切换过程。
+进程和线程的区别。
+top 命令之后有哪些内容，有什么作用。
+线上 CPU 爆高，请问你如何找到问题所在。
+多线程
+多线程的几种实现方式，什么是线程安全。
+三种：实现Runnable接口、继承Thread类。
+
+volatile 的原理，作用，能代替锁么。
+	主要归结于JMM内存模型，分为主内存以及每个线程的工作内存。使用volatile关键字能够确保a线程修改变量对于b变量是可见的。
+因为long和double两种数据类型的操作可分为高32位和低32位两部分，因此普通的long或double类型读/写可能不是原子的。因此
+将共享的long和double变量设置为volatile类型，这样能保证任何情况下对long和double的单次读/写操作都具有原子性。
+        1、volatile可以有效地防止指令的重排序-->有序性。以及可见性，不能保障原子性；但是可以保证long、double类型的变量。
+        2、volatile不能保证原子性；i++  --->1）读取i的值（2）对i加1（3）将i的值写回内存;不保证执行的按顺序进行。
+        3、有序性：a happen-before c原则。保证两者之间的顺序。
+        4、与Synchronized相比，是一种轻量级的锁机制，互补
+画一个线程的生命周期状态图。 多线程状态图
+sleep 和 wait 的区别。
+ 1、sleep()方法将获得锁的当前线程变成阻塞状态，如果是sleep(long seconds)会在指定的时间内重新
+    变成Runnable状态。该方法是Thread类的静态方法。其并没有被释放锁。
+    2、wait()方法是Object类的方法，会释放锁，进入等待线程池中，被notify()|notifyAll()唤醒。
+    这三个方法需要在同步代码块|同步方法中调用。
+sleep 和 sleep(0)的区别。
+	 1、sleep()方法通常指定时间，在这个时间之后线程会唤醒，但不一定会立即执行，根据当前的Runnable线程队列中的优先级来判定。
+    sleep(0)会在当前线程调度器的可运行队列中没有优先级比它更高的就立即执行该线程。反之会让优先级高的
+    先执行。
+Lock 与 Synchronized 的区别。
+	 1、Lock是一个接口，我接触过ReentrantLock可重入锁。及其子类-->读写锁。
+    ReentrantLock需要指定获取锁|关闭锁，通常在finally中关闭.unlock();
+    Lock能提高多个线程读操作的效率；
+    Lock可以知道线程有没有拿到锁，而synchronized不能
+    Lock可以让等待锁的线程响应中断，而synchronized不会，线程会一直等待下去
+    2、Synchronized用来表示一种全局锁的关键字，是一种悲观锁
+    使用起来比较简单，直接放在需要同步的方法或者是代码块处。交给JVM区处理；
+    Synchronized遇到异常挥着执行完毕会自动释放锁，Lock需要手动的释放。
+    synchronized能锁住类、方法和代码块，而Lock是块范围内的
+synchronized 的原理是什么，一般用在什么地方(比如加在静态方法和非静态方法的区别，静态方法和非静态方法同时执行的时候会有影响吗)，解释以下名词：重排序，自旋锁，偏向锁，轻量级锁，可重入锁，公平锁，非公平锁，乐观锁，悲观锁。
+1、JVM层面的加锁；同步方法|同步代码块JVM的处理机制是不一样的。
+同步方法维护一个ACC_SYNCHRONIZED标志，其他线程来访问方法的时候检查是狗有这个标志，有就会阻塞。出现异常锁会被自动释放
+同步代码块使用monitorenter和monitorexit两个指令实现；加锁|解锁。
+2、非静态方法:（对象锁）
+ 	给对象加锁(可以理解为给这个对象的内存上锁,注意 只是这块内存,其他同类对象都会有各自的内存锁),这时候
+ 	在其他一个以上线程中执行该对象的这个同步方法(注意:是该对象)就会产生互斥
+  静态方法: （类锁）
+  	相当于在类上加锁(*.class 位于代码区,静态方法位于静态区域,这个类产生的对象公用这个静态方法,所以这块
+   	内存，N个对象来竞争), 这时候,只要是这个类产生的对象,在调用这个静态方法时都会产生互斥
+用过哪些原子类，他们的原理是什么。
+CAS，Compare and Swap即比较并交换，设计并发算法时常用到的一种技术，java.util.concurrent包全完建立在CAS之上，并发包里面用到的一些方法；
+compareAndSwapInt都是unsafe类的方法，通过CAS机制进行原子操作。
+原子类的value使用volatile修饰，保证了原子性的情况下，多个线程对资源的修改对于其他的线程来说是可见的。
+JUC 下研究过哪些并发工具，讲讲原理。
+用过线程池吗，如果用过，请说明原理，并说说 newCache 和 newFixed 有什么区别，构 造函数的各个参数的含义是什么，比如 coreSize，maxsize 等。
+线程池的关闭方式有几种，各自的区别是什么。
+假如有一个第三方接口，有很多个线程去调用获取数据，现在规定每秒钟最多有 10 个线程同时调用它，如何做到。
+spring 的 controller 是单例还是多例，怎么保证并发的安全。
+默认是单例的(Singleton)，当Controller里面很多的非静态的成员变量的时候，可以使用@Scope("prototype")将其声明称多例。每个线程独享自己的成员变量。
+而单例会导致每次请求进来都对共享的资源进行操作，
+用三个线程按顺序循环打印 abc 三个字母，比如 abcabcabc。
+public class Test2  {
+
+    public static void main(String[] args) {
+        t t1 = new t();
+        for (int i=0;i<3;i++){
+           Thread t = new Thread(t1);
+           t.start();
+        }
+    }
+}
+class t extends Thread{
+    public void run(){
+        System.out.print("abc");
+    }
+}
+ThreadLocal 用过么，用途是什么，原理是什么，用的时候要注意什么。
+每个线程都有一个 ThreadLocal 就是每个线程都拥有了自己独立的一个变量,维护一个ThreadLocalMap<ThreadLocal, value>;并且TjreadLocal是弱引用的。
+如果让你实现一个并发安全的链表，你会怎么做。
+有哪些无锁数据结构，他们实现的原理是什么。
+讲讲 java 同步机制的 wait 和 notify。
+CAS 机制是什么，如何解决 ABA 问题。
+CAS机制维护一个期望值E，比较的时候用旧值O与E比较是否相等，相等则将O替换成新值N，
+会出现ABA问题，可以添加一个编号。
+
+多线程如果线程挂住了怎么办。
+countdowlatch 和 cyclicbarrier 的内部原理和用法，以及相互之间的差别(比如 countdownlatch 的 await 方法和是怎么实现的)。
+对 AbstractQueuedSynchronizer 了解多少，讲讲加锁和解锁的流程，独占锁和公平所加锁有什么不同。
+使用 synchronized 修饰静态方法和非静态方法有什么区别。
+简述 ConcurrentLinkedQueue 和 LinkedBlockingQueue 的用处和不同之处。
+导致线程死锁的原因？怎么解除线程死锁。
+非常多个线程（可能是不同机器），相互之间需要等待协调，才能完成某种工作，问怎么设计这种协调方案。
+用过读写锁吗，原理是什么，一般在什么场景下用。
+ReadWriteLock-->读写锁，代表了一类问题；读锁：在此期间可以多线程共享资源；写锁：表示当前线程对于这个资源是独占的。
+可以在读操作很多的情况下使用
+开启多个线程，如果保证顺序执行，有哪几种实现方式，或者如何保证多个线程都执行完再拿到结果。
+延迟队列的实现方式，delayQueue 和时间轮算法的异同。
+TCP 与 HTTP
+http1.0 和 http1.1 有什么区别。
+TCP 三次握手和四次挥手的流程，为什么断开连接要 4 次,如果握手只有两次，会出现什么。
+TIME_WAIT 和 CLOSE_WAIT 的区别。
+说说你知道的几种 HTTP 响应码，比如 200, 302, 404。
+当你用浏览器打开一个链接的时候，计算机做了哪些工作步骤
+TCP/IP 如何保证可靠性，说说 TCP 头的结构。
+如何避免浏览器缓存。
+如何理解 HTTP 协议的无状态性。
+简述 Http 请求 get 和 post 的区别以及数据包格式。
+HTTP 有哪些 method
+简述 HTTP 请求的报文格式。
+HTTP 的长连接是什么意思。
+HTTPS 的加密方式是什么，讲讲整个加密解密流程。
+Http 和 https 的三次握手有什么区别。
+什么是分块传送。
+Session 和 cookie 的区别。
+架构设计与分布式
+用 java 自己实现一个 LRU。
+分布式集群下如何做到唯一序列号。
+设计一个秒杀系统，30 分钟没付款就自动关闭交易。
+如何使用 redis 和 zookeeper 实现分布式锁？有什么区别优缺点，会有什么问题，分别适 用什么场景。（延伸：如果知道 redlock，讲讲他的算法实现，争议在哪里）
+如果有人恶意创建非法连接，怎么解决。
+分布式事务的原理，优缺点，如何使用分布式事务，2pc 3pc 的区别，解决了哪些问题， 还有哪些问题没解决，如何解决，你自己项目里涉及到分布式事务是怎么处理的。
+什么是一致性 hash。
+什么是 restful，讲讲你理解的 restful。
+如何设计一个良好的 API。
+如何设计建立和保持 100w 的长连接。
+解释什么是 MESI 协议(缓存一致性)。
+说说你知道的几种 HASH 算法，简单的也可以。
+什么是 paxos 算法，什么是 zab 协议。
+一个在线文档系统，文档可以被编辑，如何防止多人同时对同一份文档进行编辑更新。
+线上系统突然变得异常缓慢，你如何查找问题。
+说说你平时用到的设计模式。
+Dubbo 的原理，有看过源码么，数据怎么流转的，怎么实现集群，负载均衡，服务注 册和发现，重试转发，快速失败的策略是怎样的。
+一次 RPC 请求的流程是什么。
+自己实现过 rpc 么，原理可以简单讲讲。Rpc 要解决什么问题。
+异步模式的用途和意义。
+编程中自己都怎么考虑一些设计原则的，比如开闭原则，以及在工作中的应用。
+设计一个社交网站中的“私信”功能，要求高并发、可扩展等等。 画一下架构图。
+MVC 模式，即常见的 MVC 框架。
+聊下曾经参与设计的服务器架构并画图，谈谈遇到的问题，怎么解决的。
+应用服务器怎么监控性能，各种方式的区别。
+如何设计一套高并发支付方案，架构如何设计。
+如何实现负载均衡，有哪些算法可以实现。
+Zookeeper 的用途，选举的原理是什么。
+Zookeeper watch 机制原理。
+Mybatis 的底层实现原理。
+请思考一个方案，实现分布式环境下的 countDownLatch。
+后台系统怎么防止请求重复提交。
+描述一个服务从发布到被消费的详细过程。
+讲讲你理解的服务治理。
+如何做到接口的幂等性。
+如何做限流策略，令牌桶和漏斗算法的使用场景。
+什么叫数据一致性，你怎么理解数据一致性。
+分布式服务调用方，不依赖服务提供方的话，怎么处理服务方挂掉后，大量无效资源请 求的浪费，如果只是服务提供方吞吐不高的时候该怎么做，如果服务挂了，那么一会重 启，该怎么做到最小的资源浪费，流量半开的实现机制是什么。
+dubbo 的泛化调用怎么实现的，如果是你，你会怎么做。
+远程调用会有超时现象，如果做到优雅的控制，JDK 自带的超时机制有哪些，怎么实 现的。
+算法
+10 亿个数字里里面找最小的 10 个。
+有 1 亿个数字，其中有 2 个是重复的，快速找到它，时间和空间要最优。
+2 亿个随机生成的无序整数,找出中间大小的值。
+给一个不知道长度的（可能很大）输入字符串，设计一种方案，将重复的字符排重。
+遍历二叉树。
+有 3n+1 个数字，其中 3n 个中是重复的，只有 1 个是不重复的，怎么找出来。
+写一个字符串反转函数。
+常用的排序算法，快排，归并、冒泡。 快排的最优时间复杂度，最差复杂度。冒泡排 序的优化方案。
+二分查找的时间复杂度，优势。
+一个已经构建好的 TreeSet，怎么完成倒排序。
+什么是 B+树，B-树，列出实际的使用场景。
+一个单向链表，删除倒数第 N 个数据。
+200 个有序的数组，每个数组里面 100 个元素，找出 top20 的元素。
+单向链表，查找中间的那个元素
+数据库知识
+数据库隔离级别有哪些，各自的含义是什么，MYSQL 默认的隔离级别是是什么。
+什么是幻读。
+MYSQL 有哪些存储引擎，各自优缺点。
+高并发下，如何做到安全的修改同一行数据。
+乐观锁和悲观锁是什么，INNODB 的标准行级锁有哪 2 种，解释其含义。
+SQL 优化的一般步骤是什么，怎么看执行计划，如何理解其中各个字段的含义。
+数据库会死锁吗，举一个死锁的例子，mysql 怎么解决死锁。
+MYsql 的索引原理，索引的类型有哪些，如何创建合理的索引，索引如何优化。
+聚集索引和非聚集索引的区别。
+select for update 是什么含义，会锁表还是锁行或是其他。
+为什么要用 Btree 实现，它是怎么分裂的，什么时候分裂，为什么是平衡的。
+数据库的 ACID 是什么。
+某个表有近千万数据，CRUD 比较慢，如何优化。
+Mysql 怎么优化 table scan 的。
+如何写 sql 能够有效的使用到复合索引。
+mysql 中 in 和 exists 区别。
+数据库自增主键可能的问题。
+MVCC 的含义，如何实现的。
+你做过的项目里遇到分库分表了吗，怎么做的，有用到中间件么，比如 sharding jdbc 等, 他们的原理知道么。
+MYSQL 的主从延迟怎么解决。
+消息队列
+消息队列的使用场景。
+消息的重发，补充策略。
+如何保证消息的有序性。
+用过哪些 MQ，和其他 mq 比较有什么优缺点，MQ 的连接是线程安全的吗，你们公司的 MQ 服务架构怎样的。
+MQ 系统的数据如何保证不丢失。
+rabbitmq 如何实现集群高可用。
+kafka 吞吐量高的原因。
+kafka 和其他消息队列的区别，kafka 主从同步怎么实现。
+利用 mq 怎么实现最终一致性。
+使用 kafka 有没有遇到什么问题，怎么解决的。
+MQ 有可能发生重复消费，如何避免，如何做到幂等。
+MQ 的消息延迟了怎么处理，消息可以设置过期时间么，过期了你们一般怎么处理。
+缓存
+常见的缓存策略有哪些，如何做到缓存(比如 redis)与 DB 里的数据一致性，你们项目中用 到了什么缓存系统，如何设计的。
+如何防止缓存击穿和雪崩。
+缓存数据过期后的更新如何设计。
+redis 的 list 结构相关的操作。
+Redis 的数据结构都有哪些。
+Redis 的使用要注意什么，讲讲持久化方式，内存设置，集群的应用和优劣势，淘汰策略 等。
+redis2 和 redis3 的区别，redis3 内部通讯机制。
+当前 redis 集群有哪些玩法，各自优缺点，场景。
+Memcache 的原理，哪些数据适合放在缓存中。
+redis 和 memcached 的内存管理的区别。
+Redis 的并发竞争问题如何解决，了解 Redis 事务的 CAS 操作吗。
+Redis 的选举算法和流程是怎样的。
+redis 的持久化的机制，aof 和 rdb 的区别。
+redis 的集群怎么同步的数据的。
+知道哪些 redis 的优化操作。
+Reids 的主从复制机制原理。
+Redis 的线程模型是什么。
+请思考一个方案，设计一个可以控制缓存总体大小的自动适应的本地缓存。
+如何看待缓存的使用（本地缓存，集中式缓存），简述本地缓存和集中式缓存和优缺点。 本地缓存在并发使用时的注意事项。
