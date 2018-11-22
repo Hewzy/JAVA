@@ -1,0 +1,158 @@
+1、类加载执行顺序
+public class 类加载执行顺序 {
+    public static void main(String[] args) {
+        singleTon s = singleTon.getInstance();
+        System.out.println("a:"+s.a);
+        System.out.println("b:"+s.b);
+    }
+}
+class singleTon{
+    //private static singleTon instance = new singleTon();//test
+    public static int a;
+    public static int b=0;
+    private static singleTon instance = new singleTon();
+    private  singleTon(){
+        a++;
+        b++;
+    }
+    public static singleTon getInstance(){
+        return instance;
+    }
+}
+/*
+类加载的执行顺序：
+1、加载----
+2、链接
+    2.1验证----
+    2.2准备：给类变量分配内存并设置初始值；给final常量分配内存设置其值为初始值
+    2.3解析：符号引用---》直接引用
+3、初始化：给类变量赋值为初始值--->  “<clinit>--类构造器”
+test1:将test语句放在上面
+    private static singleTon instance = new singleTon();
+    public static int a;//1
+    public static int b=0;//2
+    private  singleTon(){
+        a++;
+        b++;
+    }
+    public static singleTon getInstance(){
+        return instance;
+    }
+    public class Demo1 {
+    public static void main(String[] args) {
+        singleTon s = singleTon.getInstance();
+        System.out.println("a:"+s.a);
+        System.out.println("b:"+s.b);
+    }
+    输出为a:1 b:0
+准备：instance=null；a=0；b=0
+初始化：new singleTon()==>a=1；b=1
+        继续初始化，1步的a值因为没有给初始值，所以不变；a=1
+        2步的b值因为有初始值，所以b=0；
+test2：将test语句放在下面：
+准备：instance=null；a=0；b=0
+初始化：a=0;b=0;new singleTon()--->调用构造方法a++;b++
+        a=1;b=1;
+2、HashMap的迭代
+public class 关于HashMapd迭代 {
+    public static void main(String[] args) {
+        Map<Integer, String> map = new HashMap<>();
+        map.put(1,"a");
+        map.put(2,"b");
+        map.put(3,"c");
+        /*
+        同时需要key、value的话，如何迭代。
+        Set<Map.Entry<K, V>> entrySet();该方法返回的是Set集合；
+        interface Entry<K,V> ；是Map接口的子接口，是一个包含了key和value的对象；
+         */
+        for(Map.Entry entry : map.entrySet()){
+            System.out.println("Key = "+ entry.getKey()+", Value = "+ entry.getValue());
+        }
+        System.out.println("------------------");
+
+        System.out.println("---使用迭代器进行迭代----");
+        //里面的泛型->代表需要迭代的类型；
+        Iterator<Map.Entry<Integer, String>> it = map.entrySet().iterator();
+        while(it.hasNext()){
+            Map.Entry entrys = it.next();
+            System.out.println("key-->"+entrys.getKey());
+            System.out.println("value-->"+entrys.getValue());
+        }      
+          /*
+        仅遍历Key或者是value；
+        1、Set<K> keySet();该方法返回Key的Set集合
+        2、Collection<V> values();返回Value的Collection集合
+         */
+         for (Integer i:map.keySet()){
+            System.out.println("key-->"+i);
+        }
+        for (Object o:map.values()){
+System.out.println("value-->"+o);
+3、反射和数组
+public class 反射和数组 {
+    public static void main(String[] args) throws ClassNotFoundException, IllegalAccessException, InstantiationException {
+        /*
+        1、数组这种类型并不是由常规的编译器编译生成，而是由虚拟机动态创建的，
+        所以想要通过反射的方式实例化一个数组类型是得依赖 Array 这个类型的相关 newInstance 方法的。
+        2、Class里的 getComponentType()方法--如果似乎一个Array类型则返回元素的类型，否则都是返回null；
+        3、Array提供了newInstance(Class<?> componentType, int length);
+        Creates a new array with the specified component type and length.
+        4、Array类位于java.lang.reflect.Array;包下，在于数组是一个特殊的对象，Array类提供了利用反射实例化数组的方法；
+        5、 [I --->I代表int类型，[代表是一个int型的数组
+         */
+        String b = "abd";
+        System.out.println(b.getClass().getComponentType());//null
+
+        //使用Array实例化一个特定type和length的数组
+        int[] intArray = (int[]) Array.newInstance(int.class, 3);
+        System.out.println(intArray.getClass().getComponentType());//int
+        System.out.println(intArray.length);//3
+
+       /*
+       使用Array给数组设置值
+       void set(Object array, int index, Object value)
+        */
+        Array.set(intArray,0,1);
+        Array.set(intArray,1,2);
+        System.out.println(intArray[0]);//1
+
+       /*
+       使用Array获取指定索引的值
+        Object get(Object array, int index)
+        */
+        System.out.println(Array.get(intArray,1));//2
+
+
+        Class stringArrayClass = String[].class;
+        System.out.println(stringArrayClass);//class [Ljava.lang.String;
+
+        Class clazz = Class.forName("[I");
+        //System.out.println(clazz.newInstance());
+        //Caused by: java.lang.NoSuchMethodException: [I.<init>()
+
+        Class clazz2 = Class.forName("[Ljava.lang.String;");
+        System.out.println(clazz2);//class [Ljava.lang.String;
+
+        /*
+        不能通过Class.forName()方法获取一个原生数据类型的Class对象
+         */
+        //Class intClass1 = Class.forName("I");
+       // Class intClass2 = Class.forName("int");
+        //System.out.println(intClass1);
+        //Exception in thread "main" java.lang.ClassNotFoundException: I
+
+        Class clazz3 = Array.newInstance(String.class, 0).getClass();
+        System.out.println("is array: " + clazz3.isArray());
+        
+        
+        /*
+        反射和泛型：
+        1、利用反射跳过泛型检查：
+         */
+        ArrayList<Integer> list = new ArrayList<>();
+        list.add(21);
+        //list.add("hello");
+        Class c = list.getClass();
+        Method m = c.getMethod("add",Object.class);
+        m.invoke(list,"hello");
+        的System.out.println（名单）
