@@ -1,0 +1,160 @@
+1、查看MYsql的字符编码；
+mysql> show variables like 'char%';
++--------------------------+--------------------------+
+| Variable_name            | Value                    |
++--------------------------+--------------------------+
+| character_set_client     | utf8                     |
+| character_set_connection | utf8                     |
+| character_set_database   | utf8                     |
+| character_set_filesystem | binary                   |
+| character_set_results    | utf8                     |
+| character_set_server     | utf8                     |
+| character_set_system     | utf8                     |
+| character_sets_dir       | E:\MySQL\share\charsets\ |
++--------------------------+--------------------------+
+8 rows in set, 1 warning (0.00 sec)
+
+2、设置MySQL服务器端的字符编码
+	2.1mysql> set names 'utf8';
+
+	2.2、修改MySQL的配置文件--my.ini里面的编码
+
+
+3、存储过程
+	3.1、SQL语句在执行的时候，先编译，在执行。存储过程[Stored Procedure]
+	是一组为了完成特定功能的SQL语句集，经过编译的过程之后存储在SQL服务器中，
+	使用的时候通过指定存储过程的名字并给定参数来调用执行。
+	3.2、 一个存储过程是一个可以编程的函数，它在数据库中创建并保存。同时可以和一些控制结构
+	搭配使用。
+	
+4、存储过程的使用
+	4.1首先改变 ； 的格式，因为存储过程是SQL语句集，每个SQL语句都是以；结尾，因此有必要改变；作为分隔符。<br>
+	delimiter $$
+	mysql> select * from role 
+   	 -> $$;
++----+-----------------+-----------------+-------------+------------+---------------------+---------------------+
+| id | role_name       | descpt          | code        | insert_uid | insert_time         | update_time         |
++----+-----------------+-----------------+-------------+------------+---------------------+---------------------+
+|  1 | 超级管理        | 超级管理员      | superman    |       NULL | 2018-01-09 19:28:53 | 2018-01-09 19:34:56 |
+<br>
+	还原分隔符-->delimiter ;
+	4.2、创建存储过程
+mysql> create procedure first()
+    -> begin
+    -> select 'id';
+    -> select 'descpt';
+    -> end
+    -> $$
+Query OK, 0 rows affected (0.01 sec)
+
+mysql> delimiter ;
+mysql> call first;
++----+
+| id |
++----+
+| id |
++----+
+1 row in set (0.00 sec)
+
++--------+
+| descpt |
++--------+
+| descpt |
++--------+
+1 row in set (0.01 sec)
+
+Query OK, 0 rows affected (0.02 sec)
+
+ mysql> select * from stu;
++-------------+-----------+------+--------+
+| number      | name      | age  | gender |
++-------------+-----------+------+--------+
+| itcast_0001 | zhangsan  |   28 | male   |
+| itcast_0002 | lisi      |   27 | male   |
+| itcast_0003 | 小陈瑶    |   31 | male   |
++-------------+-----------+------+--------+
+
+以什么排序，可以添加DESC，降序排序
+mysql> select age as test from stu order by age DESC;
++------+
+| test |
++------+
+|   31 |
+|   28 |
+|   27 |
++------+
+
+mysql> select age as test from stu group by age DESC;
++------+
+| test |
++------+
+|   31 |
+|   28 |
+|   27 |
++------+
+3 rows in set (0.00 sec)
+
+以什么分组。默认是升序
+mysql> select age as test from stu group by age;
++------+
+| test |
++------+
+|   27 |
+|   28 |
+|   31 |
++------+
+
+1、面试题：
+表名：s-->（s,c,score）学号、课程号、分数
+问题：找出平均分大于60分的学号、平均分。
+
+select s,avg(score) 
+from s
+group by s
+having avg(score) > 60;
+
+2、删除语句
+delete from table_name where [];
+3、插入语句
+insert into table_name (column_name)
+ values
+ (values);
+4、修改语句
+update table_name set field01=value01,field02=value02
+where [];
+
+5、细节
+5.1 使用count（列名）当某列出现null值的时候，count（*）仍然会计算，但是count(列名)不会。
+5.2 where 语句肯定在group by 之前，即也在having之前
+5.3 having只能用在group by之后，对分组后的结果进行筛选(即使用having的前提条件是分组)
+5.4 where后的条件表达式里不允许使用聚合函数（count(),sum(),avg(),max(),min()），而having可以
+
+6、
+当一个查询语句同时出现了where,group by,having,order by的时候，执行顺序和编写顺序是：
+
+1.执行where xx对全表数据做筛选，返回第1个结果集。
+2.针对第1个结果集使用group by分组，返回第2个结果集。
+3.针对第2个结果集中的每1组数据执行select xx，有几组就执行几次，返回第3个结果集。
+4.针对第3个结集执行having xx进行筛选，返回第4个结果集。
+5.针对第4个结果集排序。
+
+（小清笔记：from --> where --[result 1]--> group by --[result 2]--> select (x N) --[result 3]--> having --[result 4]--> order by --> OUTPUT）
+
+
+7、示例
+按由高到低的顺序显示个人平均分在70分以上的学生姓名和平均分，为了尽可能地提高平均分，在计算平均分前不包括分数在60分以下的成绩，并且也不计算名叫“cy”的成绩。
+
+分析：
+1．要求显示学生姓名和平均分 因此确定第1步select s_name,avg(score) from student
+2．计算平均分前不包括分数在60分以下的成绩，并且也不计算贱人（jr）的成绩 因此确定第2步 where score>=60 and s_name!=‘cy’
+3．显示个人平均分 相同名字的学生（同一个学生）考了多门科目 因此按姓名分组 确定第3步 group by s_name
+4．显示个人平均分在70分以上 因此确定第4步 having avg(s_score)>=70
+5．按由高到低的顺序 因此确定第5步 order by avg(s_score) desc
+
+SQL语句：
+select s_name,avg(score) 
+from student
+where score>60 and s_name!='cy'
+group by s_name
+having avg(score)>=70
+order by avg(score) DESC;
